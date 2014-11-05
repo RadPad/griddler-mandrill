@@ -35,6 +35,9 @@ module Griddler
             event['msg'].with_indifferent_access
           end
         rescue MultiJson::ParseError => error
+
+          puts params[:mandrill_events]
+
           @events = []
         end
       end
