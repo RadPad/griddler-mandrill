@@ -30,8 +30,12 @@ module Griddler
       attr_reader :params
 
       def events
-        @events ||= ActiveSupport::JSON.decode(params[:mandrill_events]).map do |event|
-          event['msg'].with_indifferent_access
+        begin
+          @events ||= ActiveSupport::JSON.decode(params[:mandrill_events]).map do |event|
+            event['msg'].with_indifferent_access
+          end
+        rescue MultiJson::ParseError => error
+          @events = []
         end
       end
 
