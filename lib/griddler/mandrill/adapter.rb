@@ -36,6 +36,7 @@ module Griddler
           end
         rescue MultiJson::ParseError => error
 
+          puts params
           puts params[:mandrill_events]
 
           @events = []
