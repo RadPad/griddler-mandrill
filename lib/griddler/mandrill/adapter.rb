@@ -2,7 +2,6 @@ module Griddler
   module Mandrill
     class Adapter
       def initialize(params)
-        puts params
         @params = params
       end
 
