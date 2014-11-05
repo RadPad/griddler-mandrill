@@ -2,6 +2,7 @@ module Griddler
   module Mandrill
     class Adapter
       def initialize(params)
+        puts params
         @params = params
       end
 
@@ -30,15 +31,11 @@ module Griddler
       attr_reader :params
 
       def events
-        begin
+        if params[:mandrill_events]
           @events ||= ActiveSupport::JSON.decode(params[:mandrill_events]).map do |event|
             event['msg'].with_indifferent_access
           end
-        rescue MultiJson::ParseError => error
-
-          puts params
-          puts params[:mandrill_events]
-
+        else
           @events = []
         end
       end
