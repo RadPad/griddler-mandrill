@@ -11,7 +11,11 @@ module Griddler
       end
 
       def normalize_params
+
         events.map do |event|
+          raw_headers = "";
+          event[:headers].each { |header,val| raw_headers << "#{header}: #{(val.kind_of?(Array) && val.join("\n") || val)}\n" }
+
           {
             to: recipients(:to, event),
             cc: recipients(:cc, event),
@@ -21,7 +25,8 @@ module Griddler
             text: event[:text] || '',
             html: event[:html] || '',
             raw_body: event[:raw_msg],
-            attachments: attachment_files(event)
+            attachments: attachment_files(event),
+            headers: raw_headers
           }
         end
       end
