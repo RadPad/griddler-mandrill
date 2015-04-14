@@ -15,10 +15,11 @@ module Griddler
           {
             to: recipients(:to, event),
             cc: recipients(:cc, event),
+            bcc: recipients(:bcc, event),
             from: full_email([ event[:from_email], event[:from_name] ]),
             subject: event[:subject],
-            text: event.fetch(:text, ''),
-            html: event.fetch(:html, ''),
+            text: event[:text] || '',
+            html: event[:html] || '',
             raw_body: event[:raw_msg],
             attachments: attachment_files(event)
           }
@@ -30,13 +31,9 @@ module Griddler
       attr_reader :params
 
       def events
-        if params[:mandrill_events]
-          @events ||= ActiveSupport::JSON.decode(params[:mandrill_events]).map do |event|
-            event['msg'].with_indifferent_access
-          end
-        else
-          @events = []
-        end
+        @events ||= ActiveSupport::JSON.decode(params[:mandrill_events]).map { |event|
+          event['msg'].with_indifferent_access if event['event'] == 'inbound'
+        }.compact
       end
 
       def recipients(field, event)
@@ -64,7 +61,7 @@ module Griddler
       end
 
       def create_tempfile(attachment)
-        filename = attachment[:name]
+        filename = attachment[:name].gsub(/\/|\\/, '_')
         tempfile = Tempfile.new(filename, Dir::tmpdir, encoding: 'ascii-8bit')
         content = attachment[:content]
         content = Base64.decode64(content) if attachment[:base64]
